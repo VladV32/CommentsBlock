@@ -15,7 +15,7 @@ class UpdateCommentRequest extends FormRequest
     {
         return [
             'comment' => 'required|exists:comments,id',
-            'text' => 'required|string',
+            'text' => 'required|string|max:1000',
         ];
     }
 

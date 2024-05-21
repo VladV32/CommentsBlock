@@ -56,6 +56,12 @@ return [
             'throw' => false,
         ],
 
+        'avatars' => [
+            'driver' => 'local',
+            'root' => public_path('avatars'),
+            'url' => env('APP_URL') . 'avatars',
+            'visibility' => 'public',
+        ],
     ],
 
     /*

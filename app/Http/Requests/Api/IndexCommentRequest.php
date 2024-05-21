@@ -14,7 +14,7 @@ class IndexCommentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'sort' => 'nullable|in:created_at,updated_at',
+            'sort' => 'nullable|in:created_at,updated_at,name,email',
             'page' => 'nullable|integer',
         ];
     }

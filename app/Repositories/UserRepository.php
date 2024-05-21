@@ -13,9 +13,16 @@ class UserRepository implements UserRepositoryInterface
             [
                 'name' => $userValues['user_name'],
                 'password' => md5(fake()->password),
-                'home_page' => $userValues['home_page'],
-                'avatar' => $userValues['avatar'],
+                'home_page' => $userValues['home_page'] ?? null,
+                'avatar' => $userValues['avatar'] ?? null,
             ]
         );
+    }
+
+    public function getAvatar(string $email): string
+    {
+        return User::query()
+            ->where('email', $email)
+            ->get(['avatar']);
     }
 }

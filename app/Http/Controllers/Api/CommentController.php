@@ -26,7 +26,7 @@ class CommentController extends Controller
 
     public function store(StoreCommentRequest $request, CommentService $commentService, UserService $userService): JsonResponse
     {
-        $user = $userService->firstOrCreate($request->validated());
+        $user = $userService->firstOrCreate($request, $request->validated());
 
         $comment = $commentService->createComment($user, $request->validated());
 

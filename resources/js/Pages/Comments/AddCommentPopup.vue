@@ -4,7 +4,7 @@
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">Add a comment</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close" @click="closePopup">
+          <button type="button" class="close" aria-label="Close" @click="closePopup">
             <span aria-hidden="true">×</span>
           </button>
         </div>
@@ -22,18 +22,23 @@
               <label for="home_page">Homepage:</label>
               <input type="url" class="form-control" v-model="form.home_page">
             </div>
-            <!--        <div class="form-group">-->
-            <!--          <label for="avatar">Avatar:</label>-->
-            <!--          <input type="file" class="form-control-file" v-model="form.avatar" readonly>-->
-            <!--        </div>-->
-            <!--        <div class="g-recaptcha" :data-sitekey="recaptchaSiteKey"></div>-->
+            <div class="form-group mb-3">
+              <label for="avatar" class="form-label">Avatar:</label>
+              <input type="file" class="form-control d-none" id="avatar" @change="handleFileChange($event, 'avatar')">
+              <label class="btn btn-primary" for="avatar">{{ avatarLabel }}</label>
+            </div>
+            <div class="form-group mb-3">
+              <label for="attach" class="form-label">Attach File:</label>
+              <input type="file" class="form-control d-none" id="attach" @change="handleFileChange($event, 'attach')">
+              <label class="btn btn-primary" for="attach">{{ attachLabel }}</label>
+            </div>
             <div class="form-group">
               <label for="text">Comment:</label>
               <textarea class="form-control" v-model="form.text" required></textarea>
             </div>
           </div>
           <div class="modal-footer">
-            <button type="submit" class="btn btn-primary">Send</button>
+            <button type="submit" class="btn btn-success">Send</button>
           </div>
         </form>
       </div>
@@ -42,6 +47,8 @@
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
   props: {
     isVisible: Boolean,
@@ -53,19 +60,51 @@ export default {
         email: '',
         home_page: '',
         avatar: null,
-        parent_id: null,
-        //recaptchaSiteKey: comment.env.RECAPTCHA_SITE_KEY,
+        attach: null,
         text: ''
-      }
+      },
+      avatarLabel: 'Upload Avatar',
+      attachLabel: 'Upload File'
     };
   },
   methods: {
+    handleFileChange(event, type) {
+      const file = event.target.files[0];
+      const validImageTypes = ['image/jpeg', 'image/png', 'image/gif'];
+      const validFileType = (type === 'avatar' && validImageTypes.includes(file.type)) ||
+          (type === 'attach' && (validImageTypes.includes(file.type) || (file.type === 'text/plain' && file.size <= 100 * 1024)));
+      if (!validFileType) {
+        alert(`Invalid ${type} file type. Only JPG, PNG, GIF for avatar and JPG, PNG, GIF, TXT under 100KB for attach are allowed.`);
+        this.form[type] = null;
+        if (type === 'avatar') {
+          this.avatarLabel = 'Upload Avatar';
+        } else if (type === 'attach') {
+          this.attachLabel = 'Upload File';
+        }
+      } else {
+        this.form[type] = file;
+        if (type === 'avatar') {
+          this.avatarLabel = file.name;
+        } else if (type === 'attach') {
+          this.attachLabel = file.name;
+        }
+      }
+    },
     closePopup() {
       this.$emit('close');
     },
     async submitComment() {
       try {
-        const response = await axios.post('/api/comments', this.form);
+        const formData = new FormData();
+        Object.keys(this.form).forEach(key => {
+          if (this.form[key]) formData.append(key, this.form[key]);
+        });
+
+        const response = await axios.post('/api/comments', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
         this.$emit('comment-added', response.data);
         this.closePopup();
       } catch (error) {
@@ -77,7 +116,6 @@ export default {
 </script>
 
 <style scoped>
-
 .form-group {
   margin-bottom: 15px;
 }
