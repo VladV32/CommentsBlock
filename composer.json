@@ -6,8 +6,10 @@
     "license": "MIT",
     "require": {
         "php": "^8.3",
+        "anhskohbo/no-captcha": "*",
         "darkaonline/l5-swagger": "^8.6",
         "google/recaptcha": "^1.3",
+        "inertiajs/inertia-laravel": "^1.1",
         "laravel/framework": "^11.0",
         "laravel/tinker": "^2.9"
     },
