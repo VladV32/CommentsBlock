@@ -34,7 +34,6 @@ class CommentTest extends TestCase
             'email' => 'sample@example.com',
             'home_page' => 'http://example.com',
             'text' => 'This is a sample comment.',
-            'g-recaptcha-response' => 'captcha_code',
         ];
 
         $response = $this->postJson('/api/comments', $commentData);
@@ -44,6 +43,25 @@ class CommentTest extends TestCase
         $response->assertJson(['text' => $commentData['text']]);
         $this->assertDatabaseHas('comments', [
             'text' => 'This is a sample comment.',
+        ]);
+    }
+
+    public function test_create_new_comment_with_html_tags()
+    {
+        $commentData = [
+            'user_name' => 'SampleUser',
+            'email' => 'sample@example.com',
+            'home_page' => 'http://example.com',
+            'text' => 'This is a sample comment. <a href="link" title="link">link</a><code></code><i></i><strong></strong>',
+        ];
+
+        $response = $this->postJson('/api/comments', $commentData);
+
+        $response->assertCreated();
+        $response->assertJsonIsObject('user');
+        $response->assertJson(['text' => $commentData['text']]);
+        $this->assertDatabaseHas('comments', [
+            'text' => 'This is a sample comment. &lt;a href=&quot;link&quot; title=&quot;link&quot;&gt;link&lt;/a&gt;&lt;code&gt;&lt;/code&gt;&lt;i&gt;&lt;/i&gt;&lt;strong&gt;&lt;/strong&gt;',
         ]);
     }
 
@@ -91,6 +109,28 @@ class CommentTest extends TestCase
         $response->assertUnprocessable();
         $response->assertJsonValidationErrors(['user_name', 'email', 'home_page', 'text']);
     }
+
+    public function test_create_new_comment_with_invalid_html_tags()
+    {
+        $commentData = [
+            'user_name' => 'SampleUser',
+            'email' => 'sample@example.com',
+            'home_page' => 'http://example.com',
+            'text' => 'This is a sample comment. <a href="link" title="link">link</a><?php ?><code></code><i></i><strong></strong>',
+        ];
+
+        $validText = 'This is a sample comment. <a href="link" title="link">link</a><code></code><i></i><strong></strong>';
+
+        $response = $this->postJson('/api/comments', $commentData);
+
+        $response->assertCreated();
+        $response->assertJsonIsObject('user');
+        $response->assertJson(['text' => $validText]);
+        $this->assertDatabaseHas('comments', [
+            'text' => 'This is a sample comment. &lt;a href=&quot;link&quot; title=&quot;link&quot;&gt;link&lt;/a&gt;&lt;code&gt;&lt;/code&gt;&lt;i&gt;&lt;/i&gt;&lt;strong&gt;&lt;/strong&gt;',
+        ]);
+    }
+
 
     public function test_update_comment_with_invalid_data()
     {

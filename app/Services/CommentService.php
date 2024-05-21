@@ -9,6 +9,8 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 class CommentService
 {
+    public const string HTML_ALLOWED_TAGS = '<a><code><i><strong>';
+
     public function __construct(protected CommentRepositoryInterface $commentRepository)
     {
         //
@@ -23,7 +25,7 @@ class CommentService
     {
         $commentData = [
             'user_id' => $user->id,
-            'text' => strip_tags($commentValues['text'], '<b><i><u>'),
+            'text' => $this->getTextWithAllowedTags($commentValues['text']),
             'parent_id' => $commentValues['parent_id'] ?? null,
         ];
         return $this->commentRepository->create($commentData);
@@ -32,7 +34,7 @@ class CommentService
     public function updateComment(int $commentId, array $commentValues): Comment
     {
         $commentData = [
-            'text' => strip_tags($commentValues['text'], '<b><i><u>'),
+            'text' => $this->getTextWithAllowedTags($commentValues['text']),
         ];
 
         return $this->commentRepository->update($commentId, $commentData);
@@ -41,6 +43,11 @@ class CommentService
     public function deleteComment(int $commentId): bool
     {
         return $this->commentRepository->delete($commentId);
+    }
+
+    private function getTextWithAllowedTags(string $text): string
+    {
+        return htmlspecialchars(strip_tags($text, self::HTML_ALLOWED_TAGS));
     }
 
 }

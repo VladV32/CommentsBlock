@@ -21,7 +21,7 @@ class CommentResource extends JsonResource
                 'name' => $this->resource->user->name,
                 'avatar' => $this->resource->user->avatar,
             ],
-            'text' => $this->resource->text,
+            'text' => htmlspecialchars_decode($this->resource->text),
             'parent_id' => $this->resource->parent_id,
             'created_at' => $this->resource->created_at,
             'replies' => $this->resource->replies
