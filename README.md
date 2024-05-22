@@ -42,11 +42,17 @@ This project provides a web application for managing user comments. Users can cr
 
    `./vendor/bin/sail artisan ide-helper:generate`
 
-   `./vendor/bin/sail artisan ide-helper:meta`
+10. Generate Web interface
+   
+   `./vendor/bin/sail npm install`
 
-   `./vendor/bin/sail artisan ide-helper:models --nowrite`
+   `./vendor/bin/sail npm run dev`
 
 ## Usage
+
+   Open url: http://your-project-url/
+   
+   or for development url: http://localhost/
 
 ## Endpoints
 
@@ -54,7 +60,6 @@ This project provides a web application for managing user comments. Users can cr
 
 - GET `/api/comments`: Retrieve a list of all comments.
 - POST `/api/comments`: Create a new comment. (Authentication required)
-- GET `/api/comments/{id}`: Retrieve details of a specific comment.
 - PATCH `/api/comments/{id}`: Update details of a specific comment. (Authentication required)
 - DELETE `/api/comments/{id}`: Delete a specific comment. (Authentication required)
 
