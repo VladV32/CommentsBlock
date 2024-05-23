@@ -5,7 +5,8 @@
     <AddCommentPopup :isVisible="showPopup" @close="showPopup = false"
                      @comment-added="fetchComments(data.meta.current_page)"/>
 
-    <Comment v-for="comment in data.comments" :key="comment.id" :comment="comment"/>
+    <Comment v-for="comment in data.comments" :key="comment.id" :comment="comment"
+             @comment-added="fetchComments(data.meta.current_page)"/>
     <div v-if="data.comments && data.meta.total > data.meta.per_page">
       <Bootstrap5Pagination
           :data="data"
@@ -31,7 +32,7 @@ export default {
   },
   data() {
     return {
-      data : {
+      data: {
         comments: this.initialComments.data,
         meta: this.initialComments.meta,
         links: this.initialComments.links,
@@ -52,6 +53,9 @@ export default {
         console.error('Error fetching comments:', error);
       }
     }
+  },
+  created() {
+    this.fetchComments();
   }
 }
 </script>

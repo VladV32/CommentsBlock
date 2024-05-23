@@ -10,35 +10,71 @@
           <span>{{ formatDate(comment.created_at) }}</span>
         </div>
         <div class="comment-actions">
-          <i class="fas fa-thumbs-up"></i>
-          <i class="fas fa-thumbs-down"></i>
-          <i class="fas fa-reply"></i>
-          <i class="fas fa-share"></i>
+          <font-awesome-icon icon="thumbs-up" />
+          <font-awesome-icon icon="thumbs-down" />
+          <font-awesome-icon icon="reply" @click="showReplyForm(comment.id)" />
+          <font-awesome-icon icon="share" />
         </div>
       </div>
     </div>
     <p class="comment-text">{{ comment.text }}</p>
     <div v-if="comment.replies" class="replies">
-      <Comment v-for="reply in comment.replies" :key="reply.id" :comment="reply"/>
+      <Comment v-for="reply in comment.replies" :key="reply.id" :comment="reply" @comment-added="fetchComments"/>
     </div>
+    <AddCommentPopup
+        v-if="isReplying && replyParentId === comment.id"
+        :isVisible="isReplying"
+        @close="closeReplyForm"
+        @comment-added="handleCommentAdded"
+        :parentId="replyParentId"
+    />
   </div>
 </template>
 
 <script>
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
+import {faReply, faThumbsUp, faThumbsDown, faShare} from '@fortawesome/free-solid-svg-icons';
+import {library} from '@fortawesome/fontawesome-svg-core';
+import AddCommentPopup from './AddCommentPopup.vue';
+
+library.add(faReply, faThumbsUp, faThumbsDown, faShare);
+
 export default {
   name: 'Comment',
   props: {
     comment: Object
   },
-  methods: {
-    formatDate(date) {
-      return new Date(date).toLocaleString();
-    }
+  components: {
+    FontAwesomeIcon,
+    AddCommentPopup
   },
   data() {
     return {
-      defaultAvatar: '/default-avatar.svg'
+      defaultAvatar: '/default-avatar.svg',
+      isReplying: false,
+      replyParentId: null
     };
+  },
+  methods: {
+    formatDate(date) {
+      return new Date(date).toLocaleString();
+    },
+    showReplyForm(parentId) {
+      this.isReplying = true;
+      this.replyParentId = parentId;
+    },
+    closeReplyForm() {
+      this.isReplying = false;
+      this.replyParentId = null;
+    },
+    handleCommentAdded() {
+      this.$emit('comment-added');
+      this.closeReplyForm();
+    },
+    fetchComments() {
+      // This method should be implemented in the parent component to fetch and update the comments list
+      this.$emit('comment-added');
+    }
   }
 }
 </script>
@@ -52,7 +88,7 @@ export default {
   display: flex;
   align-items: center;
   padding: 10px;
-  background-color: lightgray;
+  background-color: whitesmoke;
   border-radius: 3px;
 }
 
@@ -75,7 +111,7 @@ export default {
   display: flex;
   gap: 10px;
   margin-top: 5px;
-  color: lightskyblue;
+  color: lightsteelblue;
 }
 
 .comment-actions svg {

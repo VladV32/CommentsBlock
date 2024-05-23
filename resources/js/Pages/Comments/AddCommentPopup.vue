@@ -52,6 +52,10 @@ import axios from 'axios';
 export default {
   props: {
     isVisible: Boolean,
+    parentId: {
+      type: Number,
+      default: null
+    }
   },
   data() {
     return {
@@ -99,6 +103,9 @@ export default {
         Object.keys(this.form).forEach(key => {
           if (this.form[key]) formData.append(key, this.form[key]);
         });
+        if (this.parentId) {
+          formData.append('parent_id', this.parentId);
+        }
 
         const response = await axios.post('/api/comments', formData, {
           headers: {

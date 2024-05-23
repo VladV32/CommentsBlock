@@ -24,6 +24,7 @@ class StoreCommentRequest extends FormRequest
         $maxTextFileSize = 102400; // 100KB
 
         return [
+            'parent_id' => 'nullable|exists:comments,id',
             'user_name' => 'required|max:150|regex:/^[a-zA-Z0-9 ]+$/',
             'email' => 'required|email|max:150',
             'home_page' => 'nullable|url|max:150',
