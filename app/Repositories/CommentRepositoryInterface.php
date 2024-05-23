@@ -7,7 +7,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 interface CommentRepositoryInterface
 {
-    public function all(string $sortField, int $perPage): LengthAwarePaginator;
+    public function all(string $sortField, int $perPage, int $currentPage = 1): LengthAwarePaginator;
 
     public function create(array $commentAttributes): Comment;
 

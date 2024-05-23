@@ -14,8 +14,9 @@ class CommentController extends Controller
     public function index(IndexCommentRequest $request, CommentService $commentService): Response
     {
         $sortField = $request->validated('sort', 'created_at');
+        $page = $request->validated('page', 1);
 
-        $comments = $commentService->getAllComments($sortField, self::DEFAULT_PAGINATE_PER_PAGE);
+        $comments = $commentService->getAllComments($sortField, self::DEFAULT_PAGINATE_PER_PAGE, $page);
 
         return Inertia::render(
             'Comments/Index',

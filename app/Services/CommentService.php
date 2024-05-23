@@ -16,9 +16,9 @@ class CommentService
         //
     }
 
-    public function getAllComments(string $sortField, int $perPage): LengthAwarePaginator
+    public function getAllComments(string $sortField, int $perPage, int $currentPage = 1): LengthAwarePaginator
     {
-        return $this->commentRepository->all($sortField, $perPage);
+        return $this->commentRepository->all($sortField, $perPage, $currentPage);
     }
 
     public function createComment(User $user, array $commentValues): Comment

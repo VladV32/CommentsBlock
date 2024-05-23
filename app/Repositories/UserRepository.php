@@ -3,26 +3,36 @@
 namespace App\Repositories;
 
 use App\Models\User;
+use Illuminate\Support\Facades\Cache;
 
-class UserRepository implements UserRepositoryInterface
+class UserRepository extends BaseCacheRepository implements UserRepositoryInterface
 {
     public function firstOrCreateForEmail(string $email, array $userValues): User
     {
-        return User::firstOrCreate(
-            ['email' => $email],
-            [
-                'name' => $userValues['user_name'],
-                'password' => md5(fake()->password),
-                'home_page' => $userValues['home_page'] ?? null,
-                'avatar' => $userValues['avatar'] ?? null,
-            ]
+        $this->generateCacheKey('user_email', [$email]);
+
+        return Cache::remember(
+            $this->getCacheKey(),
+            $this->getTTL(),
+            fn() => User::firstOrCreate(
+                ['email' => $email],
+                [
+                    'name' => $userValues['user_name'],
+                    'password' => md5(fake()->password),
+                    'home_page' => $userValues['home_page'] ?? null,
+                    'avatar' => $userValues['avatar'] ?? null,
+                ]
+            )
         );
     }
 
     public function getAvatar(string $email): string
     {
-        return User::query()
-            ->where('email', $email)
-            ->get(['avatar']);
+        $this->generateCacheKey('user_avatar', [$email]);
+
+        return Cache::remember(
+            $this->getCacheKey(), $this->getTTL(),
+            fn() => User::where('email', $email)->first('avatar') ?? ''
+        );
     }
 }
