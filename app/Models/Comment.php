@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Attachment as Attachment;
 use App\Models\User as User;
 use Database\Factories\CommentFactory;
 use Illuminate\Database\Eloquent\Builder;
@@ -21,6 +22,8 @@ use Illuminate\Support\Carbon;
  * @property int|null $parent_id
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
+ * @property-read Collection<int, Attachment> $attachments
+ * @property-read int|null $attachments_count
  * @property-read Comment|null $parent
  * @property-read Collection<int, Comment> $replies
  * @property-read int|null $replies_count
@@ -60,5 +63,10 @@ class Comment extends Model
     public function parent(): BelongsTo
     {
         return $this->belongsTo(Comment::class, 'parent_id');
+    }
+
+    public function attachments(): HasMany
+    {
+        return $this->hasMany(Attachment::class);
     }
 }

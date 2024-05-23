@@ -29,7 +29,7 @@ class CommentController extends Controller
     {
         $user = $userService->firstOrCreate($request, $request->validated());
 
-        $comment = $commentService->createComment($user, $request->validated());
+        $comment = $commentService->createComment($request , $user, $request->validated());
 
         return response()->json(CommentResource::make($comment), 201);
     }

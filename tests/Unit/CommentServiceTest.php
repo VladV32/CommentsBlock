@@ -24,13 +24,13 @@ class CommentServiceTest extends TestCase
     public function test_create_comment()
     {
         $user = User::factory()->create();
+
         $data = [
-            'user_id' => $user->id,
             'text' => 'This is a test comment.',
             'parent_id' => null,
         ];
 
-        $comment = $this->commentService->createComment($user, $data);
+        $comment = $this->commentService->createComment(Request(), $user, $data);
 
         $this->assertInstanceOf(Comment::class, $comment);
         $this->assertEquals('This is a test comment.', $comment->text);

@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Api;
 
 use App\Rules\ValidHtmlRule;
+use App\Services\AttachmentService;
 use App\Services\UserService;
 use Closure;
 use Illuminate\Foundation\Http\FormRequest;
@@ -18,9 +19,9 @@ class StoreCommentRequest extends FormRequest
     {
         $maxAvatarImageWidth = UserService::AVATAR_IMAGE_MAX_WIDTH;
         $maxAvatarImageHeight = UserService::AVATAR_IMAGE_MAX_HEIGHT;
-        $maxAttachImageWidth = 320;
-        $maxAttachImageHeight = 240;
-        $maxImageSize = 2048; // 2KB
+        $maxAttachImageWidth = AttachmentService::ATTACHMENT_IMAGE_MAX_WIDTH;
+        $maxAttachImageHeight = AttachmentService::ATTACHMENT_IMAGE_MAX_HEIGHT;
+        $maxImageSize = 2048 * 1000; // 2MB
         $maxTextFileSize = 102400; // 100KB
 
         return [

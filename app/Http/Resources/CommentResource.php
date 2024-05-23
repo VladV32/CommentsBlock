@@ -25,7 +25,8 @@ class CommentResource extends JsonResource
             'text' => htmlspecialchars_decode($this->resource->text),
             'parent_id' => $this->resource->parent_id,
             'created_at' => $this->resource->created_at,
-            'replies' => CommentResourceCollection::make($this->resource->replies)
+            'replies' => CommentResourceCollection::make($this->resource->replies),
+            'attachments' => AttachmentResourceCollection::make($this->resource->attachments),
         ];
     }
 

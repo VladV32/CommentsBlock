@@ -30,6 +30,7 @@ class CommentRepository extends BaseCacheRepository implements CommentRepository
     public function create(array $commentAttributes): Comment
     {
         $comment = Comment::create($commentAttributes);
+
         $this->generateCacheKey('comment', [$comment->id]);
 
         $this->deleteCacheByPrefixOrAll('comments');
@@ -44,6 +45,7 @@ class CommentRepository extends BaseCacheRepository implements CommentRepository
     public function find(int $commentId): ?Comment
     {
         $this->generateCacheKey('comment', [$commentId]);
+
         return Cache::get($this->getCacheKey())
             ?? Cache::remember(
                 $this->getCacheKey(),
@@ -52,12 +54,15 @@ class CommentRepository extends BaseCacheRepository implements CommentRepository
             );
     }
 
-    public function update(int $commentId, array $commentAttributes): Comment|bool
+    public function update(int $commentId, array $commentAttributes): Comment|false
     {
         if ($comment = $this->find($commentId)) {
             $comment->update($commentAttributes);
+
             Cache::forget($this->getCacheKey());
+
             Cache::put($this->getCacheKey(), $comment, $this->getTTL());
+
             return $comment;
         }
         return false;
@@ -67,8 +72,24 @@ class CommentRepository extends BaseCacheRepository implements CommentRepository
     {
         if ($comment = $this->find($commentId)) {
             Cache::forget($this->getCacheKey());
+
             return $comment->delete();
         }
+        return false;
+    }
+
+    public function addAttachment($commentId, $path): Comment|false
+    {
+        if ($comment = $this->find($commentId)) {
+            $comment->attachments()->create(['path' => $path]);
+
+            Cache::forget($this->getCacheKey());
+
+            Cache::put($this->getCacheKey(), $comment, $this->getTTL());
+
+            return $comment;
+        }
+
         return false;
     }
 }

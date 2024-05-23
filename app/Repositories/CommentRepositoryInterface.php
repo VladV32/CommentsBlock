@@ -13,7 +13,9 @@ interface CommentRepositoryInterface
 
     public function find(int $commentId): ?Comment;
 
-    public function update(int $commentId, array $commentAttributes): Comment|bool;
+    public function update(int $commentId, array $commentAttributes): Comment|false;
 
     public function delete(int $commentId): bool;
+
+    public function addAttachment(int $commentId, string $path): Comment|false;
 }
