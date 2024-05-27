@@ -135,10 +135,12 @@ export default {
 }
 
 .avatar {
-  width: 50px;
-  height: 50px;
+  width: 57px;
+  height: 57px;
   border-radius: 50%;
   margin-right: 15px;
   background-color: white;
+  border: solid white;
+  padding: 2px;
 }
 </style>

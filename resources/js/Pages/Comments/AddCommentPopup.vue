@@ -47,7 +47,6 @@
 </template>
 
 <script>
-import axios from 'axios';
 
 export default {
   props: {
@@ -72,6 +71,10 @@ export default {
     };
   },
   methods: {
+    async recaptcha() {
+      await this.$recaptchaLoaded()
+      return await this.$recaptcha('submit_comment')
+    },
     handleFileChange(event, type) {
       const file = event.target.files[0];
       const validImageTypes = ['image/jpeg', 'image/png', 'image/gif'];
@@ -98,6 +101,12 @@ export default {
       this.$emit('close');
     },
     async submitComment() {
+      const recaptchaToken = await this.recaptcha();
+      if (!recaptchaToken) {
+        alert('Please complete the CAPTCHA.');
+        return;
+      }
+
       try {
         const formData = new FormData();
         Object.keys(this.form).forEach(key => {
@@ -106,6 +115,7 @@ export default {
         if (this.parentId) {
           formData.append('parent_id', this.parentId);
         }
+        formData.append('g-recaptcha-response', recaptchaToken);
 
         const response = await axios.post('/api/comments', formData, {
           headers: {
