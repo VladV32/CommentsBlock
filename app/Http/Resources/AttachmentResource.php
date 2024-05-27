@@ -6,7 +6,19 @@ use App\Models\Attachment;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Storage;
+use OpenApi\Annotations as OA;
 
+/**
+ * @OA\Schema(
+ *     schema="AttachmentResource",
+ *     @OA\Property(
+ *         property="url",
+ *         type="string",
+ *         format="url",
+ *         description="URL of the attachment"
+ *     )
+ * )
+ */
 class AttachmentResource extends JsonResource
 {
     public function __construct(Attachment $resource)

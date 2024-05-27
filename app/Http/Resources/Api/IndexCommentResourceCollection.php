@@ -5,7 +5,37 @@ namespace App\Http\Resources\Api;
 use App\Http\Resources\CommentResourceCollection;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\ResourceCollection;
+use OpenApi\Annotations as OA;
 
+/**
+ * @OA\Schema(
+ *     schema="IndexCommentResourceCollection",
+ *     @OA\Property(
+ *         property="comments",
+ *         type="array",
+ *         @OA\Items(ref="#/components/schemas/CommentResourceCollection")
+ *     ),
+ *     @OA\Property(
+ *         property="links",
+ *         type="object",
+ *         @OA\Property(property="first", type="string", format="url", description="URL to first page"),
+ *         @OA\Property(property="last", type="string", format="url", description="URL to last page"),
+ *         @OA\Property(property="prev", type="string", format="url", description="URL to previous page"),
+ *         @OA\Property(property="next", type="string", format="url", description="URL to next page")
+ *     ),
+ *     @OA\Property(
+ *         property="meta",
+ *         type="object",
+ *         @OA\Property(property="current_page", type="integer", description="Current page number"),
+ *         @OA\Property(property="from", type="integer", description="First item number on current page"),
+ *         @OA\Property(property="last_page", type="integer", description="Last page number"),
+ *         @OA\Property(property="path", type="string", format="url", description="Base path"),
+ *         @OA\Property(property="per_page", type="integer", description="Number of items per page"),
+ *         @OA\Property(property="to", type="integer", description="Last item number on current page"),
+ *         @OA\Property(property="total", type="integer", description="Total number of items")
+ *     )
+ * )
+ */
 class IndexCommentResourceCollection extends ResourceCollection
 {
     public function toArray(Request $request = null): array

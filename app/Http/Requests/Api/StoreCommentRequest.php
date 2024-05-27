@@ -7,7 +7,61 @@ use App\Services\AttachmentService;
 use App\Services\UserService;
 use Closure;
 use Illuminate\Foundation\Http\FormRequest;
+use OpenApi\Annotations as OA;
 
+/**
+ * @OA\Schema(
+ *     schema="StoreCommentRequest",
+ *     required={"user_name", "email", "text"},
+ *     @OA\Property(
+ *         property="parent_id",
+ *         type="integer",
+ *         nullable=true,
+ *         description="ID of the parent comment if exists"
+ *     ),
+ *     @OA\Property(
+ *         property="user_name",
+ *         type="string",
+ *         maxLength=150,
+ *         description="Name of the user"
+ *     ),
+ *     @OA\Property(
+ *         property="email",
+ *         type="string",
+ *         format="email",
+ *         maxLength=150,
+ *         description="Email of the user"
+ *     ),
+ *     @OA\Property(
+ *         property="home_page",
+ *         type="string",
+ *         format="url",
+ *         nullable=true,
+ *         maxLength=150,
+ *         description="Homepage URL of the user"
+ *     ),
+ *     @OA\Property(
+ *         property="avatar",
+ *         type="string",
+ *         format="binary",
+ *         nullable=true,
+ *         description="Avatar image file of the user"
+ *     ),
+ *     @OA\Property(
+ *         property="text",
+ *         type="string",
+ *         maxLength=1000,
+ *         description="Text content of the comment"
+ *     ),
+ *     @OA\Property(
+ *         property="attach",
+ *         type="string",
+ *         format="binary",
+ *         nullable=true,
+ *         description="Attachment file for the comment (image or text file)"
+ *     )
+ * )
+ */
 class StoreCommentRequest extends FormRequest
 {
     public function authorize(): bool

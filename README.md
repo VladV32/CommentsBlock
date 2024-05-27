@@ -2,7 +2,7 @@
 
 ## About
 
-This project provides a web application for managing user comments. Users can create accounts and leave comments.
+This project provides a web application for managing user comments. Users can create, leave comments.
 
 ## Installation
 
@@ -46,6 +46,9 @@ This project provides a web application for managing user comments. Users can cr
    
    `./vendor/bin/sail npm install`
 
+   `./vendor/bin/sail npm run build`
+
+   (optional but recommended for development): 
    `./vendor/bin/sail npm run dev`
 
 ## Usage

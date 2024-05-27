@@ -24,3 +24,4 @@ yarn-error.log
 /config/ide-helper.php
 /public/avatars/
 /public/attachments/
+/storage/api-docs/api-docs.json

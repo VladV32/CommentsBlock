@@ -3,7 +3,20 @@
 namespace App\Http\Requests\Api;
 
 use Illuminate\Foundation\Http\FormRequest;
+use OpenApi\Annotations as OA;
 
+/**
+ * @OA\Schema(
+ *     schema="UpdateCommentRequest",
+ *     required={"text"},
+ *     @OA\Property(
+ *         property="text",
+ *         type="string",
+ *         maxLength=1000,
+ *         description="Text content of the comment"
+ *     )
+ * )
+ */
 class UpdateCommentRequest extends FormRequest
 {
     public function authorize(): bool
