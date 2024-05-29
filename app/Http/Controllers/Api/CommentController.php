@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Events\CommentCreated;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\DestroyCommentRequest;
 use App\Http\Requests\Api\IndexCommentRequest;
@@ -100,6 +101,8 @@ class CommentController extends Controller
         $user = $userService->firstOrCreate($request, $request->validated());
 
         $comment = $commentService->createComment($request, $user, $request->validated());
+
+        broadcast(new CommentCreated(CommentResource::make($comment)))->toOthers();
 
         return ApiJsonResponse::make(CommentResource::make($comment), ApiJsonResponse::HTTP_CREATED);
     }

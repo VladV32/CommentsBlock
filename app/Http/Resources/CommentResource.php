@@ -20,6 +20,11 @@ use OpenApi\Annotations as OA;
  *         property="user",
  *         type="object",
  *         @OA\Property(
+ *             property="user_id",",
+ *             type="integer",
+ *             description="Id of the user"
+ *         ),
+ *         @OA\Property(
  *             property="name",
  *             type="string",
  *             description="Name of the user"
@@ -72,6 +77,7 @@ class CommentResource extends JsonResource
         return [
             'id' => $this->resource->id,
             'user' => [
+                'user_id' => $this->resource->user->id,
                 'name' => $this->resource->user->name,
                 'avatar' => $this->getAvatar(),
             ],

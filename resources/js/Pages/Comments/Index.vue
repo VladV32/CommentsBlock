@@ -2,11 +2,9 @@
   <div class="comments-container">
     <h1>Comments</h1>
     <button @click="showPopup = true" class="btn btn-outline-primary">Add a comment</button>
-    <AddCommentPopup :isVisible="showPopup" @close="showPopup = false"
-                     @comment-added="fetchComments(data.meta.current_page)"/>
+    <AddCommentPopup :isVisible="showPopup" @close="showPopup = false"/>
 
-    <Comment v-for="comment in data.comments" :key="comment.id" :comment="comment"
-             @comment-added="fetchComments(data.meta.current_page)"/>
+    <Comment v-for="comment in data.comments" :key="comment.id" :comment="comment"/>
     <div v-if="data.comments && data.meta.total > data.meta.per_page">
       <Bootstrap5Pagination
           :data="data"
@@ -52,10 +50,36 @@ export default {
       } catch (error) {
         console.error('Error fetching comments:', error);
       }
+    },
+    handleNewComment(comment) {
+      const addReplyToParent = (comments, reply) => {
+        for (let i = 0; i < comments.length; i++) {
+          if (comments[i].id === reply.parent_id) {
+            if (!comments[i].replies) {
+              comments[i].replies = [];
+            }
+            comments[i].replies.unshift(reply);
+            return true;
+          }
+          if (comments[i].replies && comments[i].replies.length) {
+            if (addReplyToParent(comments[i].replies, reply)) {
+              return true;
+            }
+          }
+        }
+        return false;
+      };
+
+      if (!addReplyToParent(this.data.comments, comment)) {
+        this.data.comments.unshift(comment);
+      }
     }
   },
   created() {
-    this.fetchComments();
+    window.Echo.channel('comments')
+        .listen('CommentCreated', (e) => {
+          this.handleNewComment(e.comment);
+        });
   }
 }
 </script>
