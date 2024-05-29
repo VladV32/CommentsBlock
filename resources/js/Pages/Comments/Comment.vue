@@ -17,7 +17,7 @@
         </div>
       </div>
     </div>
-    <p class="comment-text">{{ comment.text }}</p>
+    <p class="comment-text" :class="{ 'text-truncate': isTruncated }" @click="toggleTruncate" v-html="comment.text"></p>
     <div v-if="comment.replies" class="replies">
       <Comment v-for="reply in comment.replies" :key="reply.id" :comment="reply" @comment-added="fetchComments"/>
     </div>
@@ -52,6 +52,7 @@ export default {
     return {
       defaultAvatar: '/default-avatar.svg',
       isReplying: false,
+      isTruncated: true,
       replyParentId: null
     };
   },
@@ -74,6 +75,9 @@ export default {
     fetchComments() {
       // This method should be implemented in the parent component to fetch and update the comments list
       this.$emit('comment-added');
+    },
+    toggleTruncate() {
+      this.isTruncated = !this.isTruncated;
     }
   }
 }

@@ -71,8 +71,6 @@ class StoreCommentRequest extends FormRequest
 
     public function rules(): array
     {
-        $maxAvatarImageWidth = UserService::AVATAR_IMAGE_MAX_WIDTH;
-        $maxAvatarImageHeight = UserService::AVATAR_IMAGE_MAX_HEIGHT;
         $maxAttachImageWidth = AttachmentService::ATTACHMENT_IMAGE_MAX_WIDTH;
         $maxAttachImageHeight = AttachmentService::ATTACHMENT_IMAGE_MAX_HEIGHT;
         $maxImageSize = 2048 * 1000; // 2MB
@@ -88,7 +86,6 @@ class StoreCommentRequest extends FormRequest
                 'image',
                 'mimes:jpeg,png,jpg,gif,svg',
                 'max:'.$maxImageSize,
-                'dimensions:min_width='.$maxAvatarImageWidth.',min_height='.$maxAvatarImageHeight
             ],
             'text' => ['required', 'string', 'max:1000', new ValidHtmlRule()],
             'attach' => [
