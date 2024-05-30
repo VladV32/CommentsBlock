@@ -12,33 +12,40 @@
           <div class="modal-body">
             <div class="form-group">
               <label for="user_name">Name:</label>
-              <input type="text" class="form-control" v-model="form.user_name" required>
+              <input type="text" class="form-control" :class="{'is-invalid': errors.user_name}" v-model="form.user_name" @input="saveFormData" required>
+              <div v-if="errors.user_name" class="invalid-feedback">{{ errors.user_name[0] }}</div>
             </div>
             <div class="form-group">
               <label for="email">Email:</label>
-              <input type="email" class="form-control" v-model="form.email" required>
+              <input type="email" class="form-control" :class="{'is-invalid': errors.email}" v-model="form.email" @input="saveFormData" required>
+              <div v-if="errors.email" class="invalid-feedback">{{ errors.email[0] }}</div>
             </div>
             <div class="form-group">
               <label for="home_page">Homepage:</label>
-              <input type="url" class="form-control" v-model="form.home_page">
+              <input type="url" class="form-control" :class="{'is-invalid': errors.home_page}" v-model="form.home_page" @input="saveFormData">
+              <div v-if="errors.home_page" class="invalid-feedback">{{ errors.home_page[0] }}</div>
             </div>
             <div class="form-group mb-3">
               <label for="avatar" class="form-label">Avatar:</label>
               <input type="file" class="form-control d-none" id="avatar" @change="handleFileChange($event, 'avatar')">
               <label class="btn btn-primary" for="avatar">{{ avatarLabel }}</label>
+              <div v-if="errors.avatar" class="invalid-feedback">{{ errors.avatar[0] }}</div>
             </div>
             <div class="form-group mb-3">
               <label for="attach" class="form-label">Attach File:</label>
               <input type="file" class="form-control d-none" id="attach" @change="handleFileChange($event, 'attach')">
               <label class="btn btn-primary" for="attach">{{ attachLabel }}</label>
+              <div v-if="errors.attach" class="invalid-feedback">{{ errors.attach[0] }}</div>
             </div>
             <div class="form-group">
               <label for="text">Comment:</label>
-              <textarea class="form-control" v-model="form.text" required></textarea>
+              <textarea class="form-control" :class="{'is-invalid': errors.text}" v-model="form.text" @input="saveFormData" required></textarea>
+              <div v-if="errors.text" class="invalid-feedback">{{ errors.text[0] }}</div>
             </div>
           </div>
           <div class="modal-footer">
             <button type="submit" class="btn btn-success">Send</button>
+            <div v-if="errors.oops" class="invalid-feedback">{{ errors.oops }}</div>
           </div>
         </form>
       </div>
@@ -47,6 +54,7 @@
 </template>
 
 <script>
+import Cookies from 'js-cookie';
 
 export default {
   props: {
@@ -66,8 +74,10 @@ export default {
         attach: null,
         text: ''
       },
+      oops: null,
       avatarLabel: 'Upload Avatar',
-      attachLabel: 'Upload File'
+      attachLabel: 'Upload File',
+      errors: {}
     };
   },
   methods: {
@@ -81,7 +91,8 @@ export default {
       const validFileType = (type === 'avatar' && validImageTypes.includes(file.type)) ||
           (type === 'attach' && (validImageTypes.includes(file.type) || (file.type === 'text/plain' && file.size <= 100 * 1024)));
       if (!validFileType) {
-        alert(`Invalid ${type} file type. Only JPG, PNG, GIF for avatar and JPG, PNG, GIF, TXT under 100KB for attach are allowed.`);
+        let $message = `Invalid ${type} file type. Only JPG, PNG, GIF for avatar and JPG, PNG, GIF, TXT under 100KB for attach are allowed.`
+        this.errors.attach = [$message];
         this.form[type] = null;
         if (type === 'avatar') {
           this.avatarLabel = 'Upload Avatar';
@@ -89,6 +100,7 @@ export default {
           this.attachLabel = 'Upload File';
         }
       } else {
+        this.errors.attach = null;
         this.form[type] = file;
         if (type === 'avatar') {
           this.avatarLabel = file.name;
@@ -100,10 +112,23 @@ export default {
     closePopup() {
       this.$emit('close');
     },
+    saveFormData() {
+      Cookies.set('commentForm', JSON.stringify(this.form), { expires: 7 });
+    },
+    loadFormData() {
+      const savedForm = Cookies.get('commentForm');
+      if (savedForm) {
+        const form = JSON.parse(savedForm);
+        this.form.user_name = form.user_name ?? '';
+        this.form.email = form.email ?? '';
+        this.form.home_page = form.home_page ?? '';
+        this.form.text = '';
+      }
+    },
     async submitComment() {
       const recaptchaToken = await this.recaptcha();
       if (!recaptchaToken) {
-        alert('Please complete the CAPTCHA.');
+        this.errors.oops = 'Please complete the CAPTCHA.';
         return;
       }
 
@@ -125,9 +150,17 @@ export default {
         this.$emit('comment-added', response.data);
         this.closePopup();
       } catch (error) {
-        console.error('Error submitting comment:', error);
+        if (error.response && error.response.status === 422) {
+          this.errors = error.response.data.errors;
+        } else {
+          this.errors.oops = 'oops, there was an error';
+          console.error('Error submitting comment:', error.response.data.errors);
+        }
       }
     }
+  },
+  created() {
+    this.loadFormData();
   }
 };
 </script>
@@ -185,5 +218,14 @@ button.close {
   color: #000;
   text-shadow: 0 1px 0 #fff;
   opacity: .5;
+}
+
+.invalid-feedback {
+  display: block;
+  color: #dc3545;
+}
+
+.is-invalid {
+  border-color: #dc3545;
 }
 </style>
