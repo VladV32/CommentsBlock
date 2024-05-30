@@ -40,10 +40,6 @@ class UserService
             return false;
         }
 
-        if ($avatar = $this->userRepository->getAvatar($email)) {
-            Storage::disk('avatars')->delete($avatar);
-        }
-
         $file = $request->file('avatar');
 
         $image = ImageManager::imagick()->read($file);
@@ -52,8 +48,18 @@ class UserService
 
         $path = $file->hashName();
 
+        if ($avatar = $this->userRepository->getAvatar($email)) {
+            Storage::disk('avatars')->delete($avatar);
+            $this->setAvatarFile($path, $email);
+        }
+
         Storage::disk('avatars')->put($path, (string)$image->encode());
 
         return $path;
+    }
+
+    private function setAvatarFile(string $path, string $email): void
+    {
+        $this->userRepository->setAvatar($path, $email);
     }
 }

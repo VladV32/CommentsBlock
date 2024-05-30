@@ -35,4 +35,15 @@ class UserRepository extends BaseCacheRepository implements UserRepositoryInterf
             fn() => User::where('email', $email)->first('avatar') ?? ''
         );
     }
+
+    public function setAvatar(string $path, string $email): void
+    {
+        User::where('email', $email)->update(['avatar' => $path]);
+
+        $this->getAvatar($email);
+
+        Cache::forget($this->getCacheKey());
+
+        Cache::put($this->getCacheKey(), $path, $this->getTTL());
+    }
 }
