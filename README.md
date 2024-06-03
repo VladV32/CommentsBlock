@@ -51,6 +51,10 @@ This project provides a web application for managing user comments. Users can cr
    (optional but recommended for development): 
    `./vendor/bin/sail npm run dev`
 
+11. Run query workers
+
+   `./vendor/bin/sail artisan queue:work`
+
 ## Usage
 
    Open url: http://your-project-url/
