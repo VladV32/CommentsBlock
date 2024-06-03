@@ -11,18 +11,21 @@
         <form @submit.prevent="submitComment">
           <div class="modal-body">
             <div class="form-group">
-              <label for="user_name">Name:</label>
-              <input type="text" class="form-control" :class="{'is-invalid': errors.user_name}" v-model="form.user_name" @input="saveFormData" required>
+              <label for="user_name" class="required">Name:</label>
+              <input type="text" class="form-control" :class="{'is-invalid': errors.user_name}" v-model="form.user_name"
+                     @input="saveFormData" required>
               <div v-if="errors.user_name" class="invalid-feedback">{{ errors.user_name[0] }}</div>
             </div>
             <div class="form-group">
-              <label for="email">Email:</label>
-              <input type="email" class="form-control" :class="{'is-invalid': errors.email}" v-model="form.email" @input="saveFormData" required>
+              <label for="email" class="required">Email:</label>
+              <input type="email" class="form-control" :class="{'is-invalid': errors.email}" v-model="form.email"
+                     @input="saveFormData" required>
               <div v-if="errors.email" class="invalid-feedback">{{ errors.email[0] }}</div>
             </div>
             <div class="form-group">
               <label for="home_page">Homepage:</label>
-              <input type="url" class="form-control" :class="{'is-invalid': errors.home_page}" v-model="form.home_page" @input="saveFormData">
+              <input type="url" class="form-control" :class="{'is-invalid': errors.home_page}" v-model="form.home_page"
+                     @input="saveFormData">
               <div v-if="errors.home_page" class="invalid-feedback">{{ errors.home_page[0] }}</div>
             </div>
             <div class="form-group mb-3">
@@ -39,8 +42,18 @@
             </div>
             <div class="form-group">
               <label for="text">Comment:</label>
-              <textarea class="form-control" :class="{'is-invalid': errors.text}" v-model="form.text" @input="saveFormData" required></textarea>
+              <textarea class="form-control" :class="{'is-invalid': errors.text}" v-model="form.text"
+                        @input="saveFormData" required></textarea>
               <div v-if="errors.text" class="invalid-feedback">{{ errors.text[0] }}</div>
+            </div>
+            <div class="form-group">
+              <label for="captcha" class="required">Captcha:</label>
+              <CaptchaImage ref="captchaRef"/>
+              <input type="text" class="form-control" :class="{'is-invalid': errors.captcha}" v-model="captcha"
+                     required>
+              <div v-if="errors.captcha" class="invalid-feedback">
+                {{ errors.captcha }}
+              </div>
             </div>
           </div>
           <div class="modal-footer">
@@ -55,6 +68,7 @@
 
 <script>
 import Cookies from 'js-cookie';
+import { CaptchaImage } from "vue3-captcha-canvas";
 
 export default {
   props: {
@@ -63,6 +77,9 @@ export default {
       type: Number,
       default: null
     }
+  },
+  components: {
+    CaptchaImage
   },
   data() {
     return {
@@ -74,6 +91,7 @@ export default {
         attach: null,
         text: ''
       },
+      captcha: '',
       oops: null,
       avatarLabel: 'Upload Avatar',
       attachLabel: 'Upload File',
@@ -128,7 +146,12 @@ export default {
     async submitComment() {
       const recaptchaToken = await this.recaptcha();
       if (!recaptchaToken) {
-        this.errors.oops = 'Please complete the CAPTCHA.';
+        this.errors.oops = 'No complete CAPTCHA.';
+        return;
+      }
+
+      if (!this.$refs.captchaRef.verify(this.captcha)) {
+        this.errors.captcha = 'Captcha verification failed';
         return;
       }
 
@@ -227,5 +250,10 @@ button.close {
 
 .is-invalid {
   border-color: #dc3545;
+}
+
+.required::after {
+  content: " *";
+  color: #dc3545;
 }
 </style>
