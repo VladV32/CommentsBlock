@@ -1,24 +1,57 @@
-/.phpunit.cache
-/node_modules
-/public/build
+# Laravel-specific exclusions
+/vendor/
+/node_modules/
 /public/hot
+/public/build
 /public/storage
 /storage/*.key
-/vendor
+/storage/oauth-private.key
+/storage/oauth-public.key
+/storage/api-docs/
+/bootstrap/cache/
+/volumes/
+/metrics-report/
+
+# Environment files
 .env
-.env.backup
-.env.production
-.phpunit.result.cache
-Homestead.json
-Homestead.yaml
-auth.json
-npm-debug.log
-yarn-error.log
-/.fleet
-/.idea
-/.vscode
-/resources/views/vendor/l5-swagger/.gitkeep
-/_ide_helper.php
-/_ide_helper_models.php
-/.phpstorm.meta.php
+.env.*
+
+# Debug and log files
+/storage/logs/
+*.log
+*.lock
+
+# IDE and system files
+.fleet
+.idea/
+.vscode/
+*.swp
+*.swo
+_ide_helper.php
+_ide_helper_models.php
 /config/ide-helper.php
+.phpstorm.meta.php
+.php-cs-fixer.cache
+
+# Composer dependencies
+composer.lock
+
+# NPM/Yarn dependencies
+package-lock.json
+yarn.lock
+
+# PHPUnit
+.phpunit.result.cache
+
+# Docker files
+docker-compose.override.yml
+
+# Scribe documentation
+.scribe
+/public/docs/
+/resources/docs/
+/storage/app/scribe/
+
+# Custom for project
+/public/avatars/
+/public/attachments/

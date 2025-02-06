@@ -1,0 +1,5 @@
+{
+    "require-dev": {
+        "psalm/plugin-laravel": "^2.11"
+    }
+}

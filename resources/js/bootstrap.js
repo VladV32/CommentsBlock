@@ -1,3 +1,5 @@
+import 'bootstrap/dist/css/bootstrap.min.css';
+import './echo';
 import axios from 'axios';
 window.axios = axios;
 
