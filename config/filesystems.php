@@ -57,14 +57,14 @@ return [
         'avatars' => [
             'driver'     => 'local',
             'root'       => public_path('avatars'),
-            'url'        => env('APP_URL') . 'avatars',
+            'url'        => env('APP_URL') . '/avatars',
             'visibility' => 'public',
         ],
 
         'attachments' => [
             'driver'     => 'local',
             'root'       => public_path('attachments'),
-            'url'        => env('APP_URL') . 'attachments',
+            'url'        => env('APP_URL') . '/attachments',
             'visibility' => 'public',
         ],
     ],

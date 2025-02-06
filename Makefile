@@ -12,7 +12,6 @@ help:
 	make -pRrq  -f $(THIS_FILE) : 2>/dev/null | awk -v RS= -F: '/^# File/,/^# Finished Make data base/ {if ($$1 !~ "^[#.]") {print $$1}}' | sort | egrep -v -e '^[^[:alnum:]]' -e '^$@$$'
 up:
 	docker-compose up -d
-	docker-compose exec --user "${WWWUSER}:${WWWGROUP}" php bash -c "composer post-queue-work-develop"
 build:
 	docker-compose build
 	docker-compose up -d
@@ -34,7 +33,9 @@ front:
 	docker-compose exec php bash -c "npm i"
 	docker-compose exec php bash -c "npm run dev"
 clear:
-	docker-compose exec php bash -c "php artisan optimize"
+	docker-compose exec php bash -c "php artisan optimize:clear"
+docs:
+	docker-compose exec php bash -c "php artisan scribe:generate"
 test:
 	docker-compose exec php bash -c "composer generate_meta_helpers"
 	docker-compose exec php bash -c "composer fix_style"
@@ -45,9 +46,11 @@ migrate:
 rollback:
 	docker-compose exec php bash -c "php artisan migrate:rollback"
 metrics:
+	docker-compose exec php bash -c "php artisan optimize:clear"
 	sh -c 'docker-compose exec --user "${WWWUSER}:${WWWGROUP}" php bash -c "composer phpmetrics"'
 	open metrics-report/index.html
 unit:
+	docker-compose exec php bash -c "php artisan optimize:clear"
 	docker-compose exec php bash -c "php artisan test --parallel --recreate-databases"
 queue:
-	docker-compose exec --user "${WWWUSER}:${WWWGROUP}" php bash -c "composer post-queue-work-develop"
+	docker-compose exec --user "${WWWUSER}:${WWWGROUP}" php bash -c "composer post-queue-work"

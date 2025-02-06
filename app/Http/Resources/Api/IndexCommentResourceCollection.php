@@ -2,7 +2,7 @@
 
 namespace App\Http\Resources\Api;
 
-use App\Http\Resources\CommentResourceCollection;
+use App\Http\Resources\CommentResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
@@ -28,7 +28,7 @@ use Illuminate\Http\Resources\Json\ResourceCollection;
  *         @OA\Property(property="current_page", type="integer", description="Current page number"),
  *         @OA\Property(property="from", type="integer", description="First item number on current page"),
  *         @OA\Property(property="last_page", type="integer", description="Last page number"),
- *         @OA\Property(property="path", type="string", format="url", description="Base path"),
+ *         @OA\Property(property="path", type="string", format="url", description="CommentDTOs path"),
  *         @OA\Property(property="per_page", type="integer", description="Number of items per page"),
  *         @OA\Property(property="to", type="integer", description="Last item number on current page"),
  *         @OA\Property(property="total", type="integer", description="Total number of items")
@@ -37,10 +37,15 @@ use Illuminate\Http\Resources\Json\ResourceCollection;
  */
 class IndexCommentResourceCollection extends ResourceCollection
 {
+    /**
+     * @param null|Request $request
+     *
+     * @return array
+     */
     public function toArray(Request $request = null): array
     {
         return [
-            'comments' => CommentResourceCollection::make($this->resource),
+            'comments' => CommentResource::collection($this->resource),
             'links'    => [
                 'first' => $this->resource->url(1),
                 'last'  => $this->resource->url($this->resource->lastPage()),

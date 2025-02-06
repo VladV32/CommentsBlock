@@ -2,60 +2,98 @@
 
 namespace App\Services;
 
+use App\Contracts\DtoInterface;
+use App\DTO\Comment\CommentDto;
+use App\DTO\Comment\IndexCommentDto;
+use App\DTO\Comment\StoreCommentDto;
+use App\DTO\Comment\UpdateCommentDto;
 use App\Models\Comment;
 use App\Models\User;
-use App\Repositories\CommentRepositoryInterface;
-use Illuminate\Http\Request;
+use App\Repositories\Interface\CommentRepositoryInterface;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Psr\SimpleCache\InvalidArgumentException;
 
 class CommentService
 {
     public const string HTML_ALLOWED_TAGS = '<a><code><i><strong>';
 
+    /**
+     * @param CommentRepositoryInterface $commentRepository
+     * @param UserService                $userService
+     * @param MediaService               $mediaService
+     */
     public function __construct(
         protected CommentRepositoryInterface $commentRepository,
         protected UserService $userService,
-        private readonly AttachmentService $attachmentService
+        private readonly MediaService $mediaService,
     ) {
         //
     }
 
-    public function getAllComments(string $sortField, int $perPage, int $currentPage = 1): LengthAwarePaginator
+    /**
+     * @param IndexCommentDto $dto
+     * @param int             $perPage
+     *
+     * @return LengthAwarePaginator
+     */
+    public function getAllComments(DtoInterface $dto, int $perPage): LengthAwarePaginator
     {
-        return $this->commentRepository->all($sortField, $perPage, $currentPage);
+        return $this->commentRepository->all($dto->getSort(), $perPage, $dto->getCurrentPage());
     }
 
-    public function createComment(Request $request, User $user, array $commentValues): Comment
+    /**
+     * @param StoreCommentDto $dto
+     * @param User            $user
+     *
+     * @throws InvalidArgumentException
+     * @return Comment
+     */
+    public function createComment(DtoInterface $dto, User $user): Comment
     {
         $commentData = [
             'user_id'   => $user->id,
-            'text'      => $this->getTextWithAllowedTags($commentValues['text']),
-            'parent_id' => $commentValues['parent_id'] ?? null,
+            'text'      => $this->getTextWithAllowedTags($dto->getText()),
+            'parent_id' => $dto->getParentId(),
         ];
 
         $comment = $this->commentRepository->create($commentData);
 
-        if ($path = $this->attachmentService->getPathOfAttachment($request)) {
+        if ($dto->getAttach() && $path = $this->mediaService->getMediaPath($dto->getAttach())) {
             return $this->commentRepository->addAttachment($comment->id, $path);
         }
 
         return $comment;
     }
 
-    public function updateComment(int $commentId, array $commentValues): Comment
+    /**
+     * @param UpdateCommentDto $dto
+     *
+     * @return Comment
+     */
+    public function updateComment(DtoInterface $dto): Comment
     {
         $commentData = [
-            'text' => $this->getTextWithAllowedTags($commentValues['text']),
+            'text' => $this->getTextWithAllowedTags($dto->getText()),
         ];
 
-        return $this->commentRepository->update($commentId, $commentData);
+        return $this->commentRepository->update($dto->getId(), $commentData);
     }
 
-    public function deleteComment(int $commentId): bool
+    /**
+     * @param CommentDto $dto
+     *
+     * @return bool
+     */
+    public function deleteComment(DtoInterface $dto): bool
     {
-        return $this->commentRepository->delete($commentId);
+        return $this->commentRepository->delete($dto->getId());
     }
 
+    /**
+     * @param string $text
+     *
+     * @return string
+     */
     private function getTextWithAllowedTags(string $text): string
     {
         return htmlspecialchars(strip_tags($text, self::HTML_ALLOWED_TAGS));

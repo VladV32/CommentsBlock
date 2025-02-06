@@ -2,29 +2,19 @@
 
 namespace Tests\Unit;
 
+use App\DTO\Comment\StoreCommentDto;
 use App\Models\User;
-use App\Services\UserService;
-use Illuminate\Contracts\Container\BindingResolutionException;
-use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-use Tests\TestCase;
+use Tests\Abstract\UnitTestCase;
 
-class UserServiceTest extends TestCase
+class UserServiceTest extends UnitTestCase
 {
-    use RefreshDatabase;
-
-    protected UserService $userService;
-
-    /**
-     * @throws BindingResolutionException
-     */
     public function setUp(): void
     {
         parent::setUp();
 
-        $this->userService = $this->app->make(UserService::class);
+        $this->dto = StoreCommentDto::class;
     }
 
     public function test_first_or_create_user()
@@ -32,11 +22,12 @@ class UserServiceTest extends TestCase
         $userData = [
             'user_name' => 'Test User',
             'email'     => 'test@example.com',
+            'text'      => 'This is a test comment.',
             'home_page' => 'http://example.com',
             'avatar'    => null,
         ];
 
-        $user = $this->userService->firstOrCreate(Request(), $userData);
+        $user = $this->getUser($userData);
 
         $this->assertInstanceOf(User::class, $user);
         $this->assertEquals('test@example.com', $user->email);
@@ -50,11 +41,12 @@ class UserServiceTest extends TestCase
         $userData = [
             'user_name' => 'Existing User',
             'email'     => 'existing@example.com',
+            'text'      => 'This is a test comment.',
             'home_page' => 'http://example.com',
             'avatar'    => null,
         ];
 
-        $user = $this->userService->firstOrCreate(Request(), $userData);
+        $user = $this->getUser($userData);
 
         $this->assertInstanceOf(User::class, $user);
         $this->assertEquals($existingUser->id, $user->id);
@@ -70,13 +62,12 @@ class UserServiceTest extends TestCase
         $userData = [
             'user_name' => 'Test User',
             'email'     => 'test@example.com',
+            'text'      => 'This is a test comment.',
             'home_page' => 'http://example.com',
             'avatar'    => $avatar,
         ];
 
-        $request = new FormRequest($userData);
-
-        $user = $this->userService->firstOrCreate($request, $userData);
+        $user = $this->getUser($userData);
 
         $this->assertInstanceOf(User::class, $user);
         $this->assertEquals('test@example.com', $user->email);
@@ -96,13 +87,12 @@ class UserServiceTest extends TestCase
         $userData = [
             'user_name' => 'Existing User',
             'email'     => 'existing@example.com',
+            'text'      => 'This is a test comment.',
             'home_page' => 'http://example.com',
             'avatar'    => $avatar,
         ];
 
-        $request = new FormRequest($userData);
-
-        $user = $this->userService->firstOrCreate($request, $userData);
+        $user = $this->getUser($userData);
 
         $this->assertInstanceOf(User::class, $user);
         $this->assertEquals($existingUser->id, $user->id);

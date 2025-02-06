@@ -17,19 +17,31 @@ class BaseCacheRepository
 
     private string $cacheKey;
 
+    /**
+     * @param string $tag
+     * @param array  $data
+     *
+     * @return void
+     */
     public function generateCacheKey(string $tag, array $data = []): void
     {
         $hashedData = array_map(fn ($item) => hash('sha256', $item), $data);
         $this->setCacheKey($tag . self::CACHE_KEY_SEPARATOR . implode(self::CACHE_KEY_SEPARATOR, $hashedData));
     }
 
+    /**
+     * @return string
+     */
     public function getCacheKey(): string
     {
         return $this->cacheKey;
     }
 
     /**
+     * @param string $prefix
+     *
      * @throws InvalidArgumentException
+     * @return void
      */
     public function deleteCacheByPrefixOrAll(string $prefix): void
     {
@@ -44,11 +56,21 @@ class BaseCacheRepository
         }
     }
 
+    /**
+     * @param int $ttl
+     *
+     * @return Carbon
+     */
     public function getTTL(int $ttl = self::ONE_HOUR_TTL): Carbon
     {
         return now()->addSeconds($ttl);
     }
 
+    /**
+     * @param string $cacheKey
+     *
+     * @return void
+     */
     private function setCacheKey(string $cacheKey): void
     {
         $this->cacheKey = $cacheKey;

@@ -20,11 +20,19 @@ use Illuminate\Support\Facades\Storage;
  */
 class AttachmentResource extends JsonResource
 {
+    /**
+     * @param Attachment $resource
+     */
     public function __construct(Attachment $resource)
     {
         parent::__construct($resource);
     }
 
+    /**
+     * @param null|Request $request
+     *
+     * @return null[]|string[]
+     */
     public function toArray(Request $request = null): array
     {
         return [
@@ -32,6 +40,9 @@ class AttachmentResource extends JsonResource
         ];
     }
 
+    /**
+     * @return null|string
+     */
     private function getAttachment(): ?string
     {
         return $this->resource->path ? Storage::disk('attachments')->url($this->resource->path) : null;

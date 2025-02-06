@@ -8,12 +8,25 @@ use Illuminate\Contracts\Validation\ValidationRule;
 
 class ValidHtmlRule implements ValidationRule
 {
+    /**
+     * @param string  $attribute
+     * @param mixed   $value
+     * @param Closure $fail
+     *
+     * @return void
+     */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         //
     }
 
-    public function passes($attribute, $value): bool
+    /**
+     * @param array  $attribute
+     * @param string $value
+     *
+     * @return bool
+     */
+    public function passes(array $attribute, string $value): bool
     {
         // List of allowed tags
         $allowedTags = CommentService::HTML_ALLOWED_TAGS;
@@ -25,6 +38,9 @@ class ValidHtmlRule implements ValidationRule
         return $value === $stripped;
     }
 
+    /**
+     * @return string
+     */
     public function message(): string
     {
         return 'The :attribute field contains invalid HTML.';

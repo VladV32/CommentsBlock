@@ -7,13 +7,12 @@
     "require": {
         "php": "^8.3",
         "astrotomic/laravel-translatable": "^11.15",
-        "inertiajs/inertia-laravel": "^1.3",
+        "inertiajs/inertia-laravel": "^2.0.0",
         "intervention/image-laravel": "^1.4",
         "laravel/framework": "^11.41",
         "laravel/reverb": "^v1.4",
         "laravel/sanctum": "^4.0",
         "opcodesio/log-viewer": "^3.14",
-        "spatie/laravel-data": "^4.13",
         "vladimir-yuldashev/laravel-queue-rabbitmq": "^14.1"
     },
     "require-dev": {
@@ -57,7 +56,7 @@
             "@php -r \"file_exists('database/database.sqlite') || touch('database/database.sqlite');\"",
             "@php artisan migrate --graceful --ansi"
         ],
-        "post-queue-work-develop": [
+        "post-queue-work": [
             "@php artisan queue:work > storage/logs/queue.log 2>&1 &"
         ],
         "fix_style": [
@@ -70,7 +69,7 @@
             "./tools/phpstan/vendor/bin/phpstan analyse app --ansi --memory-limit 512M"
         ],
         "psalm": [
-            "./tools/psalm/vendor/bin/psalm app --show-info=true --memory-limit=512M"
+            "./tools/psalm/vendor/bin/psalm"
         ],
         "phpmetrics": [
             "./tools/phpmetrics/vendor/bin/phpmetrics --report-html=metrics-report ./app"

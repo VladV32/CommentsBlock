@@ -2,15 +2,27 @@
 
 namespace App\Http\Requests\Api;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Enums\CommentDtoEnum;
+use App\Http\Requests\BaseDtoRequests;
 
-class DestroyCommentRequest extends FormRequest
+class DestroyCommentRequest extends BaseDtoRequests
 {
+    /**
+     * @var CommentDtoEnum
+     */
+    protected CommentDtoEnum $dtoClass = CommentDtoEnum::DESTROY_COMMENT;
+
+    /**
+     * @return bool
+     */
     public function authorize(): bool
     {
         return true;
     }
 
+    /**
+     * @return string[]
+     */
     public function rules(): array
     {
         return [
@@ -18,6 +30,9 @@ class DestroyCommentRequest extends FormRequest
         ];
     }
 
+    /**
+     * @return array
+     */
     public function messages(): array
     {
         return [
@@ -25,6 +40,9 @@ class DestroyCommentRequest extends FormRequest
         ];
     }
 
+    /**
+     * @return void
+     */
     protected function prepareForValidation(): void
     {
         $this->merge([

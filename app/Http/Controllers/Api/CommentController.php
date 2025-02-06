@@ -13,7 +13,7 @@ use App\Http\Resources\CommentResource;
 use App\Http\Responses\ApiJsonResponse;
 use App\Services\CommentService;
 use App\Services\UserService;
-use Illuminate\Http\JsonResponse;
+use Psr\SimpleCache\InvalidArgumentException;
 
 /**
  * @OA\Info(
@@ -66,15 +66,13 @@ class CommentController extends Controller
      *     @OA\Response(response=422, description="Bad request")
      * )
      */
-    public function index(IndexCommentRequest $request, CommentService $commentService): JsonResponse
+    public function index(IndexCommentRequest $request, CommentService $commentService): ApiJsonResponse
     {
-        $sortField = $request->validated('sort', 'created_at');
-        $page      = $request->validated('page', 1);
-
-        $comments = $commentService->getAllComments($sortField, self::DEFAULT_PAGINATE_PER_PAGE, $page);
+        $comments = $commentService->getAllComments($request->getDto(), self::DEFAULT_PAGINATE_PER_PAGE);
 
         return ApiJsonResponse::make(IndexCommentResourceCollection::make($comments));
     }
+
     /**
      * @OA\Post(
      *     path="/api/comments",
@@ -93,12 +91,16 @@ class CommentController extends Controller
      *     @OA\Response(response=401, description="Unauthorized"),
      *     @OA\Response(response=422, description="Bad request")
      * )
+     * @throws InvalidArgumentException
      */
-    public function store(StoreCommentRequest $request, CommentService $commentService, UserService $userService): JsonResponse
-    {
-        $user = $userService->firstOrCreate($request, $request->validated());
+    public function store(
+        StoreCommentRequest $request,
+        CommentService $commentService,
+        UserService $userService
+    ): ApiJsonResponse {
+        $user = $userService->getUser($request->getDto());
 
-        $comment = $commentService->createComment($request, $user, $request->validated());
+        $comment = $commentService->createComment($request->getDto(), $user);
 
         broadcast(new CommentCreated(CommentResource::make($comment)))->toOthers();
 
@@ -132,9 +134,9 @@ class CommentController extends Controller
      *     @OA\Response(response=422, description="Bad request")
      * )
      */
-    public function update(UpdateCommentRequest $request, CommentService $commentService): JsonResponse
+    public function update(UpdateCommentRequest $request, CommentService $commentService): ApiJsonResponse
     {
-        $comment = $commentService->updateComment($request->validated('comment'), $request->validated());
+        $comment = $commentService->updateComment($request->getDto());
 
         return ApiJsonResponse::make(CommentResource::make($comment));
     }
@@ -161,9 +163,9 @@ class CommentController extends Controller
      *     @OA\Response(response=422, description="Bad request")
      * )
      */
-    public function destroy(DestroyCommentRequest $request, CommentService $commentService): JsonResponse
+    public function destroy(DestroyCommentRequest $request, CommentService $commentService): ApiJsonResponse
     {
-        $commentService->deleteComment($request->validated('comment'));
+        $commentService->deleteComment($request->getDto());
 
         return ApiJsonResponse::make(null, ApiJsonResponse::HTTP_NO_CONTENT);
     }

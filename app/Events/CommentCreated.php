@@ -15,11 +15,17 @@ class CommentCreated implements ShouldBroadcast
     use InteractsWithSockets;
     use SerializesModels;
 
+    /**
+     * @param CommentResource $comment
+     */
     public function __construct(public CommentResource $comment)
     {
         //
     }
 
+    /**
+     * @return Channel
+     */
     public function broadcastOn(): Channel
     {
         return new Channel('comments');

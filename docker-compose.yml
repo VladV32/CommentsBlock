@@ -10,6 +10,7 @@ services:
             - 'host.docker.internal:host-gateway'
         ports:
             - '${APP_PORT:-80}:80'
+            - '8000:80'
             - '${VITE_PORT:-5173}:${VITE_PORT:-5173}'
         environment:
             WWWUSER: '${WWWUSER}'
@@ -123,6 +124,24 @@ services:
             - 'sail-rabbitmq:/data'
         networks:
             - sail
+
+    queue:
+        build:
+            context: ./vendor/laravel/sail/runtimes/8.3
+            dockerfile: Dockerfile
+            args:
+                WWWGROUP: '${WWWGROUP}'
+        image: sail-8.3/app
+        volumes:
+          - '.:/var/www/html'
+        environment:
+            WWWUSER: '${WWWUSER}'
+        restart: on-failure
+        command: php artisan queue:work > storage/logs/queue.log 2>&1 &
+        networks:
+            - sail
+        depends_on:
+            - php
 
 networks:
     sail:

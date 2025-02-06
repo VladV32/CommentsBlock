@@ -3,12 +3,15 @@
 namespace App\Repositories;
 
 use App\Models\Comment;
+use App\Repositories\Interface\CommentRepositoryInterface;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Cache;
-use Psr\SimpleCache\InvalidArgumentException;
 
 class CommentRepository extends BaseCacheRepository implements CommentRepositoryInterface
 {
+    /**
+     * @inheritDoc
+     */
     public function all(string $sortField, int $perPage, int $currentPage = 1): LengthAwarePaginator
     {
         $this->generateCacheKey('comments', [$sortField, $perPage, $currentPage]);
@@ -24,7 +27,7 @@ class CommentRepository extends BaseCacheRepository implements CommentRepository
     }
 
     /**
-     * @throws InvalidArgumentException
+     * @inheritDoc
      */
     public function create(array $commentAttributes): Comment
     {
@@ -41,6 +44,9 @@ class CommentRepository extends BaseCacheRepository implements CommentRepository
         );
     }
 
+    /**
+     * @inheritDoc
+     */
     public function find(int $commentId): ?Comment
     {
         $this->generateCacheKey('comment', [$commentId]);
@@ -53,6 +59,9 @@ class CommentRepository extends BaseCacheRepository implements CommentRepository
             );
     }
 
+    /**
+     * @inheritDoc
+     */
     public function update(int $commentId, array $commentAttributes): Comment|false
     {
         if ($comment = $this->find($commentId)) {
@@ -68,6 +77,9 @@ class CommentRepository extends BaseCacheRepository implements CommentRepository
         return false;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function delete(int $commentId): bool
     {
         if ($comment = $this->find($commentId)) {
@@ -79,7 +91,10 @@ class CommentRepository extends BaseCacheRepository implements CommentRepository
         return false;
     }
 
-    public function addAttachment($commentId, $path): Comment|false
+    /**
+     * @inheritDoc
+     */
+    public function addAttachment(int $commentId, string $path): Comment|false
     {
         if ($comment = $this->find($commentId)) {
             $comment->attachments()->create(['path' => $path]);

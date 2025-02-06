@@ -66,11 +66,19 @@ use Illuminate\Support\Facades\Storage;
  */
 class CommentResource extends JsonResource
 {
+    /**
+     * @param Comment $resource
+     */
     public function __construct(Comment $resource)
     {
         parent::__construct($resource);
     }
 
+    /**
+     * @param null|Request $request
+     *
+     * @return array
+     */
     public function toArray(Request $request = null): array
     {
         return [
@@ -83,11 +91,14 @@ class CommentResource extends JsonResource
             'text'        => htmlspecialchars_decode($this->resource->text),
             'parent_id'   => $this->resource->parent_id,
             'created_at'  => $this->resource->created_at,
-            'replies'     => CommentResourceCollection::make($this->resource->replies),
-            'attachments' => AttachmentResourceCollection::make($this->resource->attachments),
+            'replies'     => CommentResource::collection($this->resource->replies),
+            'attachments' => AttachmentResource::collection($this->resource->attachments),
         ];
     }
 
+    /**
+     * @return null|string
+     */
     private function getAvatar(): ?string
     {
         return $this->resource->user->avatar ? Storage::disk('avatars')->url($this->resource->user->avatar) : null;

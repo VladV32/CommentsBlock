@@ -3,9 +3,9 @@
 namespace App\Providers;
 
 use App\Repositories\CommentRepository;
-use App\Repositories\CommentRepositoryInterface;
+use App\Repositories\Interface\CommentRepositoryInterface;
+use App\Repositories\Interface\UserRepositoryInterface;
 use App\Repositories\UserRepository;
-use App\Repositories\UserRepositoryInterface;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\ServiceProvider;
 

@@ -2,39 +2,31 @@
 
 namespace Tests\Unit;
 
+use App\DTO\Comment\CommentDto;
+use App\DTO\Comment\StoreCommentDto;
+use App\DTO\Comment\UpdateCommentDto;
 use App\Models\Comment;
 use App\Models\User;
-use App\Services\CommentService;
-use Illuminate\Contracts\Container\BindingResolutionException;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
+use Tests\Abstract\UnitTestCase;
 
-class CommentServiceTest extends TestCase
+class CommentServiceTest extends UnitTestCase
 {
-    use RefreshDatabase;
-
-    protected CommentService $commentService;
-
-    /**
-     * @throws BindingResolutionException
-     */
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        $this->commentService = $this->app->make(CommentService::class);
-    }
-
     public function test_create_comment()
     {
         $user = User::factory()->create();
 
+        $this->dto = StoreCommentDto::class;
+
         $data = [
+            'user_name' => $user->name,
+            'email'     => $user->email,
             'text'      => 'This is a test comment.',
+            'home_page' => null,
             'parent_id' => null,
         ];
 
-        $comment = $this->commentService->createComment(Request(), $user, $data);
+        $dto     = $this->getDTO($data);
+        $comment = $this->commentService->createComment($dto, $user);
 
         $this->assertInstanceOf(Comment::class, $comment);
         $this->assertEquals('This is a test comment.', $comment->text);
@@ -44,9 +36,16 @@ class CommentServiceTest extends TestCase
     public function test_update_comment()
     {
         $comment = Comment::factory()->create(['text' => 'Old text']);
-        $data    = ['text' => 'Updated text'];
 
-        $updatedComment = $this->commentService->updateComment($comment->id, $data);
+        $this->dto = UpdateCommentDto::class;
+
+        $data = [
+            'comment' => $comment->id,
+            'text'    => 'Updated text',
+        ];
+
+        $dto            = $this->getDTO($data);
+        $updatedComment = $this->commentService->updateComment($dto);
 
         $this->assertInstanceOf(Comment::class, $updatedComment);
         $this->assertEquals('Updated text', $updatedComment->text);
@@ -57,7 +56,15 @@ class CommentServiceTest extends TestCase
     {
         $comment = Comment::factory()->create();
 
-        $result = $this->commentService->deleteComment($comment->id);
+        $this->dto = CommentDto::class;
+
+        $data = [
+            'comment' => $comment->id,
+        ];
+
+        $dto = $this->getDTO($data);
+
+        $result = $this->commentService->deleteComment($dto);
 
         $this->assertTrue($result);
         $this->assertDatabaseMissing('comments', ['id' => $comment->id]);

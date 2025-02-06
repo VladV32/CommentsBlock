@@ -11,12 +11,15 @@ use Inertia\Response;
 
 class CommentController extends Controller
 {
+    /**
+     * @param IndexCommentRequest $request
+     * @param CommentService      $commentService
+     *
+     * @return Response
+     */
     public function index(IndexCommentRequest $request, CommentService $commentService): Response
     {
-        $sortField = $request->validated('sort', 'created_at');
-        $page      = $request->validated('page', 1);
-
-        $comments = $commentService->getAllComments($sortField, self::DEFAULT_PAGINATE_PER_PAGE, $page);
+        $comments = $commentService->getAllComments($request->getDto(), self::DEFAULT_PAGINATE_PER_PAGE);
 
         return Inertia::render(
             'Comments/Index',

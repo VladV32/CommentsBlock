@@ -2,10 +2,11 @@
 
 namespace App\Http\Requests\Api;
 
+use App\Enums\CommentDtoEnum;
+use App\Http\Requests\BaseDtoRequests;
 use App\Rules\ValidHtmlRule;
-use App\Services\AttachmentService;
+use App\Services\MediaService;
 use Closure;
-use Illuminate\Foundation\Http\FormRequest;
 
 /**
  * @OA\Schema(
@@ -60,17 +61,28 @@ use Illuminate\Foundation\Http\FormRequest;
  *     )
  * )
  */
-class StoreCommentRequest extends FormRequest
+class StoreCommentRequest extends BaseDtoRequests
 {
+    /**
+     * @var CommentDtoEnum
+     */
+    protected CommentDtoEnum $dtoClass = CommentDtoEnum::STORE_COMMENT;
+
+    /**
+     * @return bool
+     */
     public function authorize(): bool
     {
         return true;
     }
 
+    /**
+     * @return array
+     */
     public function rules(): array
     {
-        $maxAttachImageWidth  = AttachmentService::ATTACHMENT_IMAGE_MAX_WIDTH;
-        $maxAttachImageHeight = AttachmentService::ATTACHMENT_IMAGE_MAX_HEIGHT;
+        $maxAttachImageWidth  = MediaService::ATTACHMENT_IMAGE_MAX_WIDTH;
+        $maxAttachImageHeight = MediaService::ATTACHMENT_IMAGE_MAX_HEIGHT;
         $maxImageSize         = 2048 * 1000; // 2MB
         $maxTextFileSize      = 102400; // 100KB
 
@@ -120,6 +132,9 @@ class StoreCommentRequest extends FormRequest
         ];
     }
 
+    /**
+     * @return string[]
+     */
     public function messages(): array
     {
         return [

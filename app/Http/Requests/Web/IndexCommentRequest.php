@@ -2,15 +2,27 @@
 
 namespace App\Http\Requests\Web;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Enums\CommentDtoEnum;
+use App\Http\Requests\BaseDtoRequests;
 
-class IndexCommentRequest extends FormRequest
+class IndexCommentRequest extends BaseDtoRequests
 {
+    /**
+     * @var CommentDtoEnum
+     */
+    protected CommentDtoEnum $dtoClass = CommentDtoEnum::INDEX_COMMENT;
+
+    /**
+     * @return bool
+     */
     public function authorize(): bool
     {
         return true;
     }
 
+    /**
+     * @return string[]
+     */
     public function rules(): array
     {
         return [
@@ -19,6 +31,9 @@ class IndexCommentRequest extends FormRequest
         ];
     }
 
+    /**
+     * @return void
+     */
     protected function prepareForValidation(): void
     {
         $this->merge([

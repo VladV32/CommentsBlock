@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests\Api;
 
-use Illuminate\Foundation\Http\FormRequest;
-use OpenApi\Annotations as OA;
+use App\Enums\CommentDtoEnum;
+use App\Http\Requests\BaseDtoRequests;
 
 /**
  * @OA\Schema(
@@ -17,13 +17,24 @@ use OpenApi\Annotations as OA;
  *     )
  * )
  */
-class UpdateCommentRequest extends FormRequest
+class UpdateCommentRequest extends BaseDtoRequests
 {
+    /**
+     * @var CommentDtoEnum
+     */
+    protected CommentDtoEnum $dtoClass = CommentDtoEnum::UPDATE_COMMENT;
+
+    /**
+     * @return bool
+     */
     public function authorize(): bool
     {
         return true;
     }
 
+    /**
+     * @return string[]
+     */
     public function rules(): array
     {
         return [
@@ -32,6 +43,9 @@ class UpdateCommentRequest extends FormRequest
         ];
     }
 
+    /**
+     * @return array
+     */
     public function messages(): array
     {
         return [
@@ -39,6 +53,9 @@ class UpdateCommentRequest extends FormRequest
         ];
     }
 
+    /**
+     * @return void
+     */
     protected function prepareForValidation(): void
     {
         $this->merge([
